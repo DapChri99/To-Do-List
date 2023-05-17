@@ -1,8 +1,13 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {TodoForm} from './TodoForm'
 import { v4 as uuidv4 } from 'uuid'
 import { Todo } from './Todo'
 import { EditTodoForm } from './EditTodoForm'
+import { collection, getDocs } from 'firebase/firestore'
+import { db } from '../firebase'
+
+
+
 
 uuidv4()
 
@@ -34,6 +39,22 @@ export const Todowrapper = () => {
         setTodos(todos.map(todo => todo.id === id ?
              {...todo, task, isEditing: !todo.isEditing} : todo))
     }
+
+    useEffect( ()=>{
+        async function fetchData() {
+        const querySnapshot = await getDocs(collection(db, "todos"));
+        let todosArr = [];
+        querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        todosArr.push(doc.data());
+        console.log(doc.id, " => ", doc.data());
+        });
+        
+        setTodos(todosArr)
+
+        }
+        fetchData();
+    })
 
  return (
     <div className='TodoWrapper'>
